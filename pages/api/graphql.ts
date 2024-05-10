@@ -1,27 +1,21 @@
 // import { ApolloServer } from "@apollo/server";
 // import { startServerAndCreateNextHandler } from "@as-integrations/next";
 // import { PrismaClient } from "@prisma/client";
-// import { prisma } from "../../prisma/db";
 // import { typeDefs } from "@/graphql/schema";
 // import { resolvers } from "@/graphql/resolvers";
-
-import { ApolloServer } from "@apollo/server";
-import { startServerAndCreateNextHandler } from "@as-integrations/next";
-
-// export type Context = {
-// 	prisma: PrismaClient;
-// };
-
 // const apolloServer = new ApolloServer<Context>({ typeDefs, resolvers });
 
 // export default startServerAndCreateNextHandler(apolloServer, {
 // 	context: async (req, res) => ({ req, res, prisma }),
 // });
 
-const resolvers = {
-  Query: {
-    hello: () => "world",
-  },
+import { ApolloServer } from "@apollo/server";
+import { startServerAndCreateNextHandler } from "@as-integrations/next";
+import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../prisma/db";
+
+export type Context = {
+  prisma: PrismaClient;
 };
 
 const typeDefs = `#graphql
@@ -31,26 +25,83 @@ type Novel {
   image: String
   createdAt: String
   updatedAt: String
-  author: [Author]
+  authors: [Author]
 }
 
 type Author {
   id: String
   name: String
-  novelId: String
+  novelID: String
 }
 type Query {
+  novel(id: ID!): Novel
     novels: [Novel]
 }
-
-type Mutation{
-  
+type Mutation {
+  addNovel(image: String, title: String) : Novel
+  updateNovel(id:ID!, image: String, title: String) : Novel
+  deleteNovel(id:ID!) : Novel
 }
+
 `;
 
-const server = new ApolloServer({
-    resolvers,
-    typeDefs
-})
+const resolvers = {
+  Query: {
+    novels: async (parent: any, args: any, context: Context) => {
+      return await context.prisma.novel.findMany();
+    },
+    novel: async (parent: any, args: any, context: Context) => {
+      return await context.prisma.novel.findUnique({
+        where: {
+          id: args.id
+        }
+      });
+    },
+  },
+  Novel: {
+    authors: async (parent: any, args: any, context: Context) => {
+      return await context.prisma.author.findMany({
+        where: {
+          novelId: parent.id,
+        },
+      });
+    },
+  },
+  Mutation: {
+    addNovel: async (parent: any, args: any, context: Context) => {
+      return await context.prisma.novel.update({
+        where: {
+          id: args.id
+        },
+        data: {
+          title: args.title,
+          image: args.image
+        }
+      });
+    },
+    updateNovel: async (parent: any, args: any, context: Context) => {
+      return await context.prisma.novel.create({
+        data: {
+          title: args.title,
+          image: args.image
+        }
+      });
+    },
+    deleteNovel: async (parent: any, args: any, context: Context) => {
+      return await context.prisma.novel.delete({
+        where: {
+          id: args.id
+        }
+      });
+    },
+  }
+};
 
-export default startServerAndCreateNextHandler(server)
+const apolloServer = new ApolloServer<Context>({
+  resolvers,
+  typeDefs,
+});
+
+export default startServerAndCreateNextHandler(apolloServer, {
+  context: async (req, res) => ({ req, res, prisma }),
+});
