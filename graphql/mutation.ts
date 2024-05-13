@@ -49,3 +49,21 @@ mutation Mutation($id: ID!, $image: String, $title: String) {
   }
 }
 `
+export const ADD_AUTHOR = gql`
+mutation Mutation($novelId: ID!, $name: String) {
+  addAuthor(novelId: $novelId, name: $name) {
+    id
+    name
+    novelID
+  }
+}
+`
+export const DELETE_AUTHOR = gql`
+mutation Mutation($id: ID!) {
+  deleteAuthor(id: $id) {
+    id
+    name
+    novelID
+  }
+}
+`

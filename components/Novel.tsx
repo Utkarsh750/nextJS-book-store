@@ -15,7 +15,7 @@ export const Novel = ({ novel }: Props) => {
       refetchQueries: [{ query: GET_NOVELS }],
     });
   return (
-    <article className="flex flex-col p-4  bg-slate-200 dark:bg-zinc-800 hover:scale-110 shadow-sm hover:shadow-lg hover:bg-slate-300 transition duration-300 ease-out text-white ">
+    <article className="flex flex-col p-4  bg-zinc-200 dark:bg-zinc-800 hover:scale-110 shadow-sm hover:shadow-lg hover:bg-slate-300 transition duration-300 ease-out text-black ">
       {/* image */}
       {novel.image && (
         <div>

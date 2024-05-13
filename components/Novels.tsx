@@ -27,13 +27,13 @@ export const Novels = () => {
 
   if (loading)
     return (
-      <p className="text-white flex items-center justify-center">
+      <p className="text-black flex items-center justify-center">
         Loading ....
       </p>
     );
   if (error)
     return (
-      <p className="text-white flex items-center justify-center">
+      <p className="text-black flex items-center justify-center">
         Oops! Something went wrong ....
       </p>
     );

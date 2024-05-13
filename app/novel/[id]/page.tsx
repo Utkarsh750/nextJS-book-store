@@ -1,5 +1,5 @@
 "use client";
-import { UPDATE_NOVEL } from "@/graphql/mutation";
+import { ADD_AUTHOR, DELETE_AUTHOR, UPDATE_NOVEL } from "@/graphql/mutation";
 import { GET_NOVEL } from "@/graphql/queries";
 import { INovel } from "@/typing";
 import { useMutation, useQuery } from "@apollo/client";
@@ -19,14 +19,15 @@ const Novel = ({ params: { id } }: Props) => {
   const { data, loading, error } = useQuery(GET_NOVEL, {
     variables: { id },
   });
-  //   const [addAuthor] = useMutation(ADD_AUTHOR, {
-  //     variables: { novelId: id, name },
-  //     refetchQueries: [{ query: GET_NOVEL, variables: { id } }],
-  //   });
 
-  //   const [deleteAuthor] = useMutation(DELETE_AUTHOR, {
-  //     refetchQueries: [{ query: GET_NOVEL, variables: { id } }],
-  //   });
+  const [addAuthor] = useMutation(ADD_AUTHOR, {
+    variables: { novelId: id, name },
+    refetchQueries: [{ query: GET_NOVEL, variables: { id } }],
+  });
+
+  const [deleteAuthor] = useMutation(DELETE_AUTHOR, {
+    refetchQueries: [{ query: GET_NOVEL, variables: { id } }],
+  });
 
   const [updateNovel] = useMutation(UPDATE_NOVEL, {
     variables: { id: id, title: title, image: url },
@@ -35,12 +36,12 @@ const Novel = ({ params: { id } }: Props) => {
 
   const novel: INovel = data?.novel;
 
-  //   const handleAddAuthor = (e: React.FormEvent<HTMLFormElement>) => {
-  //     e.preventDefault();
-  //     if (name === "") return alert("Please enter author name");
-  //     addAuthor({ variables: { novelId: id, name } });
-  //     setName("");
-  //   };
+  const handleAddAuthor = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (name === "") return alert("Please enter author name");
+    addAuthor({ variables: { novelId: id, name } });
+    setName("");
+  };
 
   const handleUpdateNovel = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -76,16 +77,17 @@ const Novel = ({ params: { id } }: Props) => {
             {novel?.authors?.map((author) => (
               <div key={author.id} className="flex items-center gap-2">
                 <h2 className="font-bold">{author?.name}</h2>
-                {/* <AiFillMinusCircle
+                <AiFillMinusCircle
                   onClick={() =>
                     deleteAuthor({
                       variables: {
-                        id: author.id,c
+                        id: author.id,
                       },
                     })
                   }
-                  color="yellow"
-                /> */}
+                  color="red"
+                  cursor="pointer"
+                />
               </div>
             ))}
           </div>
@@ -99,7 +101,7 @@ const Novel = ({ params: { id } }: Props) => {
             consectetur soluta totam temporibus libero.
           </p>
           {/* add author form */}
-          <form className="mt-5 space-x-2">
+          <form onSubmit={handleAddAuthor} className="mt-5 space-x-2">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
