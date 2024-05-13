@@ -16,3 +16,19 @@ query Novels {
     }
   }
 `
+export const GET_NOVEL = gql`
+query Query($id: ID!) {
+  novel(id: $id) {
+    authors {
+      id
+      name
+      novelID
+    }
+    createdAt
+    id
+    image
+    title
+    updatedAt
+  }
+}
+`
