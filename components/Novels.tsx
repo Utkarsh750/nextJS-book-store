@@ -15,7 +15,7 @@ export const Novels = () => {
     variables: { image, title },
     refetchQueries: [{ query: GET_NOVELS }],
   });
-  const novels: INovel = data?.novels;
+  const novels: INovel[] = data?.novels;
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (image === "" || title === "") return alert("Enter fields");
